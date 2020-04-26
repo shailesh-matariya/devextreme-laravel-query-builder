@@ -1,0 +1,55 @@
+{
+    "name": "shailesh-matariya/devextreme-laravel-query-builder",
+    "description": "Devextreme data filter parser into optimised laravel raw query",
+    "keywords": [
+        "shailesh-matariya",
+        "devextreme-laravel-query-builder"
+    ],
+    "homepage": "https://github.com/shailesh-matariya/devextreme-laravel-query-builder",
+    "license": "MIT",
+    "type": "library",
+    "authors": [
+        {
+            "name": "Shailesh Matariya",
+            "email": "patel.shailesh987@gmail.com",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": "^7.1",
+        "illuminate/support": "^7.0",
+        "ext-json": "*"
+    },
+    "require-dev": {
+        "orchestra/testbench": "^4.0",
+        "phpunit/phpunit": "^8.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "ShaileshMatariya\\DevextremeQueryBuilder\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "ShaileshMatariya\\DevextremeQueryBuilder\\Tests\\": "tests"
+        }
+    },
+    "scripts": {
+        "test": "vendor/bin/phpunit",
+        "test-coverage": "vendor/bin/phpunit --coverage-html coverage"
+
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "ShaileshMatariya\\DevextremeQueryBuilder\\DevextremeQueryBuilderServiceProvider"
+            ],
+            "aliases": {
+                "DevextremeLaravelQueryBuilder": "ShaileshMatariya\\DevextremeQueryBuilder\\DevextremeQueryBuilderFacade"
+            }
+        }
+    }
+}
