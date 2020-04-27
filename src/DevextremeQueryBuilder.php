@@ -5,6 +5,7 @@ namespace ShaileshMatariya\DevextremeQueryBuilder;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use ShaileshMatariya\DevextremeQueryBuilder\Helpers\QueryDataHelper;
+use ShaileshMatariya\DevextremeQueryBuilder\Interfaces\CanBeFilter;
 
 class DevextremeQueryBuilder
 {
@@ -20,6 +21,15 @@ class DevextremeQueryBuilder
     /** @var string */
     public $parameters;
 
+    /** @var array */
+    private $columns;
+
+    /**
+     * @var array
+     * @TODO only join for the required tables
+     */
+    private $joins = [];
+
     /**
      * @return Model
      */
@@ -32,10 +42,16 @@ class DevextremeQueryBuilder
      * @param Model $model
      *
      * @return DevextremeQueryBuilder
+     * @throws \Exception
      */
     public function model(Model $model): DevextremeQueryBuilder
     {
-        $this->model = $model;
+        if (! $model instanceof CanBeFilter) {
+            throw new \Exception('model should be implement CanBeFilter Interface.');
+        }
+
+        $this->model = new $model;
+        $this->setColumns($model->getColumns());
 
         return $this;
     }
@@ -48,6 +64,20 @@ class DevextremeQueryBuilder
     public function filter(array $filter): DevextremeQueryBuilder
     {
         $this->filter = $filter;
+
+        return $this;
+    }
+
+    /**
+     * set columns for filter
+     *
+     * @param $columns array
+     *
+     * @return DevextremeQueryBuilder
+     */
+    private function setColumns($columns = []): DevextremeQueryBuilder
+    {
+        $this->columns = $columns;
 
         return $this;
     }
