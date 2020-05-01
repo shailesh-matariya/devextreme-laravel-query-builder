@@ -4,6 +4,9 @@ namespace ShaileshMatariya\DevextremeQueryBuilder;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Validator;
+use ShaileshMatariya\DevextremeQueryBuilder\Exceptions\BadValueException;
+use ShaileshMatariya\DevextremeQueryBuilder\Helpers\Column;
 use ShaileshMatariya\DevextremeQueryBuilder\Helpers\QueryDataHelper;
 use ShaileshMatariya\DevextremeQueryBuilder\Interfaces\CanBeFilter;
 
@@ -39,13 +42,17 @@ class DevextremeQueryBuilder
     }
 
     /**
-     * @param Model $model
+     * @param Model | string $model
      *
      * @return DevextremeQueryBuilder
      * @throws \Exception
      */
-    public function model(Model $model): DevextremeQueryBuilder
+    public function model($model): DevextremeQueryBuilder
     {
+        if (is_string($model)) {
+            $model = new $model;
+        }
+
         if (! $model instanceof CanBeFilter) {
             throw new \Exception('model should be implement CanBeFilter Interface.');
         }
@@ -69,6 +76,24 @@ class DevextremeQueryBuilder
     }
 
     /**
+     * add to parameter
+     *
+     * @param $value
+     */
+    public function addToParameters($value)
+    {
+        $this->parameters[] = $value;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getQuery()
+    {
+        return $this->query;
+    }
+
+    /**
      * set columns for filter
      *
      * @param $columns array
@@ -77,7 +102,11 @@ class DevextremeQueryBuilder
      */
     private function setColumns($columns = []): DevextremeQueryBuilder
     {
-        $this->columns = $columns;
+        foreach ($columns as $column) {
+            if ($column instanceof Column) {
+                $this->columns[$column->key] = $column;
+            }
+        }
 
         return $this;
     }
@@ -114,7 +143,7 @@ class DevextremeQueryBuilder
     public function get()
     {
         // Parse the filter
-        $builder = $this->dataSourceFilter($this->model->newQuery());
+        return $builder = $this->dataSourceFilter($this->model->newQuery());
 
         // returns output
     }
@@ -182,8 +211,42 @@ class DevextremeQueryBuilder
      */
     private function singleExpressionToQuery($expression)
     {
-        // check validations
+        $column = $this->validate($expression);
 
         // convert to query
+    }
+
+    /**
+     * get Columns for the query filter
+     *
+     * @param bool $key
+     *
+     * @return Column|bool|mixed
+     */
+    private function getColumn($key)
+    {
+        return $this->columns[$key] ?? false;
+    }
+
+    /**
+     * validate user input
+     *
+     * @param $expression
+     *
+     * @return Column
+     */
+    private function validate($expression)
+    {
+        if (! $column = $this->getColumn($expression['field']))
+            throw new BadValueException($expression['field'] . ' key is not exists for the filter.');
+
+        $validator = Validator::make($expression, [
+            'value' => $column->validator
+        ]);
+
+        if ($validator->fails())
+            throw new BadValueException('Validation failed for the ' . $expression['field'] . ' in the filter');
+
+        return $column;
     }
 }

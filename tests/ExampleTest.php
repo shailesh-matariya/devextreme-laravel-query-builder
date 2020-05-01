@@ -25,7 +25,7 @@ class ExampleTest extends TestCase
     public function initial_check()
     {
         $filter = ["first_name", "contains", "End"];
-        $response = DevextremeQueryBuilderFacade::model(new DummyModel())->filter($filter);
+        $response = DevextremeQueryBuilderFacade::model(DummyModel::class)->filter($filter)->get();
         dd($response);
     }
 }

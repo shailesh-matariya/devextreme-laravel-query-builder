@@ -2,8 +2,12 @@
 
 namespace ShaileshMatariya\DevextremeQueryBuilder;
 
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Facade;
 
+/**
+ * @method static DevextremeQueryBuilder model(Model|string $model)
+ * */
 class DevextremeQueryBuilderFacade extends Facade
 {
     /**
